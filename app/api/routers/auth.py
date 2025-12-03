@@ -1,9 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import HTTPAuthorizationCredentials
+
 from app.api.schemas.auth import UserRegister, UserLogin, Token, UserOut, UserUpdate
+from app.domain.interfaces.security.jwt_provider_impl import JWTTokenProvider
 from app.use_cases.permission import Permission
 from app.use_cases.users_service import UserService
-from app.api.dependencies import get_user_service, get_current_user, get_permission_service
-
+from app.api.dependencies import get_user_service, get_current_user, get_permission_service, bearer_scheme, \
+    get_blacklist_service
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -32,6 +35,29 @@ async def login_user(
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
 
+@router.post("/logout")
+async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    current_user=Depends(get_current_user)
+):
+    token = credentials.credentials
+
+    token_provider = JWTTokenProvider()
+    payload = token_provider.decode(token)
+
+    if payload is None:
+        raise HTTPException(status_code=400, detail="Invalid token")
+
+    exp = payload.get("exp")
+    if exp is None:
+        raise HTTPException(status_code=400, detail="Invalid token")
+
+    blacklist = get_blacklist_service()
+    # Добавляем токен в blacklist
+    blacklist.add(token, exp)
+
+    return {"detail": "Logged out successfully"}
+
 
 @router.get("/users_list", response_model=list[UserOut])
 async def list_users(
@@ -51,7 +77,7 @@ async def get_user(user_id: int,
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not (user.id == user_id or permission.has_permission(user.id, "users", "read")):
+    if user.id != user_id and not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
 
     user = service.get_user(user_id)
@@ -69,7 +95,7 @@ async def update_user(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not (user.id == user_id or permission.has_permission(user.id, "users", "read")):
+    if user.id != user_id and not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     user = service.get_user(user_id)
     if not user:
@@ -94,4 +120,3 @@ async def delete_user(
         raise HTTPException(404, "Пользователь не найден")
     service.delete_user(user_id)
     return {"status": "deleted"}
-

@@ -15,7 +15,7 @@ class UserRoleRepositoryImpl(UserRoleRepository):
         self.db.add(db_user_role)
         self.db.commit()
         self.db.refresh(db_user_role)
-        return self._to_domain(db_user_role)
+        return self._to_domain((db_user_role, None, None))
 
     def get_by_user(self, user_id: int) -> list[DomainUserRole]:
         db_user_roles = (
@@ -27,7 +27,7 @@ class UserRoleRepositoryImpl(UserRoleRepository):
         )
         for user_role in db_user_roles:
             print(user_role[0], user_role[1])
-        return [self._to_domain_name(user_role) for user_role in db_user_roles]
+        return [self._to_domain(user_role) for user_role in db_user_roles]
 
     def get_all(self) -> list[DomainUserRole]:
         db_user_roles = (
@@ -36,7 +36,7 @@ class UserRoleRepositoryImpl(UserRoleRepository):
             .join(DbRole, DbRole.id == DbUserRole.role_id)
             .all()
         )
-        return [self._to_domain_name(user_role) for user_role in db_user_roles]
+        return [self._to_domain(user_role) for user_role in db_user_roles]
 
     def update(self, user_role: DomainUserRole, data: dict) -> DomainUserRole:
         db_user_role = self.get_by_user_role_id(user_role.user_id, user_role.role_id)
@@ -53,16 +53,16 @@ class UserRoleRepositoryImpl(UserRoleRepository):
             self.db.query(DbUserRole).filter(DbUserRole.user_id == user_id, DbUserRole.role_id == role_id).
             first()
         )
-        return self._to_domain(db_user_role) if db_user_role else None
+        return self._to_domain((db_user_role, None, None)) if db_user_role else None
 
     def get_by_id(self, user_role_id: int) -> DomainUserRole | None:
         db_user_role = (
             self.db.query(DbUserRole).filter(DbUserRole.id == user_role_id).first()
         )
-        return self._to_domain(db_user_role) if db_user_role else None
+        return self._to_domain((db_user_role, None, None)) if db_user_role else None
 
     @staticmethod
-    def _to_domain_name(db_user_role) -> DomainUserRole:
+    def _to_domain(db_user_role) -> DomainUserRole:
         db_obj, user_name, role_name = db_user_role
 
         return DomainUserRole(
@@ -73,10 +73,10 @@ class UserRoleRepositoryImpl(UserRoleRepository):
             role_name=role_name,
         )
 
-    @staticmethod
-    def _to_domain(db_user_role) -> DomainUserRole:
-        return DomainUserRole(
-            id=db_user_role.id,
-            user_id=db_user_role.user_id,
-            role_id=db_user_role.role_id,
-        )
+    # @staticmethod
+    # def _to_domain(db_user_role) -> DomainUserRole:
+    #     return DomainUserRole(
+    #         id=db_user_role.id,
+    #         user_id=db_user_role.user_id,
+    #         role_id=db_user_role.role_id,
+    #     )
