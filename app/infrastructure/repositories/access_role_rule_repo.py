@@ -67,15 +67,3 @@ class AccessRoleRuleRepositoryImpl(AccessRoleRuleRepository):
             role_name=role_name,
             element_code=element_code,
         )
-
-    # @staticmethod
-    # def _to_domain(db_rule: DbRule) -> DomainRule:
-    #     return DomainRule(
-    #         id=db_rule.id,
-    #         role_id=db_rule.role_id,
-    #         element_id=db_rule.element_id,
-    #         read_permission=db_rule.read_permission,
-    #         create_permission=db_rule.create_permission,
-    #         update_permission=db_rule.update_permission,
-    #         delete_permission=db_rule.delete_permission,
-    #     )

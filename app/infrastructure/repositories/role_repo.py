@@ -37,7 +37,8 @@ class RoleRepositoryImpl(RoleRepository):
         self.db.refresh(db_role)
         return self._to_domain(db_role)
 
-    def _to_domain(self, db: DbRole) -> DomainRole:
+    @staticmethod
+    def _to_domain(db: DbRole) -> DomainRole:
         return DomainRole(
             id=db.id,
             name=db.name,

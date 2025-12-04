@@ -68,6 +68,9 @@ async def update_role(
 ):
     if not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
+    role = service.get(role_id)
+    if not role:
+        raise HTTPException(404, "Role not found")
     try:
         return service.update(role_id, data)
     except ValueError as e:
@@ -128,6 +131,9 @@ async def update_element(
 ):
     if not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
+    element = service.get(element_id)
+    if not element:
+        raise HTTPException(404, "Element not found")
     try:
         return service.update(element_id, data)
     except ValueError as e:
@@ -189,6 +195,9 @@ async def update_rule(
 ):
     if not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
+    rule = service.get(rule_id)
+    if not rule:
+        raise HTTPException(404, "Rule not found")
     try:
         return service.update(rule_id, data)
     except ValueError as e:
@@ -263,6 +272,9 @@ async def update_rule(
 ):
     if not permission.has_permission(user.id, "users", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
+    user_role = service.get(user_role_id)
+    if not user_role:
+        raise HTTPException(404, "User Role not found")
     try:
         return service.update(user_role_id, data)
     except ValueError as e:

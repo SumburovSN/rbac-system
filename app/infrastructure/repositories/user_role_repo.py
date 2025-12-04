@@ -72,11 +72,3 @@ class UserRoleRepositoryImpl(UserRoleRepository):
             user_name=user_name,
             role_name=role_name,
         )
-
-    # @staticmethod
-    # def _to_domain(db_user_role) -> DomainUserRole:
-    #     return DomainUserRole(
-    #         id=db_user_role.id,
-    #         user_id=db_user_role.user_id,
-    #         role_id=db_user_role.role_id,
-    #     )

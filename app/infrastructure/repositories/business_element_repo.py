@@ -37,7 +37,8 @@ class BusinessElementRepositoryImpl(BusinessElementRepository):
         self.db.refresh(db_el)
         return self._to_domain(db_el)
 
-    def _to_domain(self, db: DbElement) -> DomainElement:
+    @staticmethod
+    def _to_domain(db: DbElement) -> DomainElement:
         return DomainElement(
             id=db.id,
             code=db.code,

@@ -48,6 +48,13 @@ RBAC (Role Based Access Control)
         ("Auditor", "orders", True, False, False, False)
 Роли распределяются по пользователям соответствующим образом.
 
+Все endpoints проверяют полномочия на соответствующее действие, за исключением:
+1. Регистрация пользователя
+2. Логин пользователя
+
+Доступ к бизнес-элементу осуществляется с проверкой наименования бизнес-элемента (за исключением элемента "all"),
+а также полномочия. Пользователю даются полномочия read, update, delete своего аккаунта (по user_id) 
+
 Приложение на основе FastAPI
 ЗАПУСК: uvicorn app.main:app --reload
 Переадресация  http://127.0.0.1:8000 сразу на Swagger
@@ -55,8 +62,7 @@ RBAC (Role Based Access Control)
 Затем в Swagger идем вверх, справа жмем кнопку AUTHORIZE и вводим токен в HTTPBearer  (http, Bearer) Value.
 
 Не реализованы (продолжаю работать над):
-1. логаут с внесением токена в blacklist Redis и дальнейшей проверкой в get_current_user
-2. Эндпоинты CRUD goods и orders с Mock-View
-3. Несколько unittest
+1. pytest
+2. Репозиторий под postgesql
 
 

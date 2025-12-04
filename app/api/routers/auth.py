@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPAuthorizationCredentials
-
 from app.api.schemas.auth import UserRegister, UserLogin, Token, UserOut, UserUpdate
 from app.domain.interfaces.security.jwt_provider_impl import JWTTokenProvider
 from app.use_cases.permission import Permission
