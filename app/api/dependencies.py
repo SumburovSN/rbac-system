@@ -20,6 +20,9 @@ from app.infrastructure.repositories.access_role_rule_repo import AccessRoleRule
 
 bearer_scheme = HTTPBearer()
 
+def get_blacklist_service():
+    return TokenBlacklistService()
+
 def get_db():
     db = SessionLocal()
     try:
@@ -29,11 +32,12 @@ def get_db():
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    blacklist: TokenBlacklistService = Depends(get_blacklist_service)
 ) -> User:
     token = credentials.credentials
 
-    blacklist = get_blacklist_service()
+    # blacklist = get_blacklist_service()
     if blacklist.contains(token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -61,9 +65,11 @@ def get_user_service(db: Session = Depends(get_db)):
 def get_role_service(db: Session = Depends(get_db)):
     return RoleService(RoleRepositoryImpl(db))
 
+
 def get_permission_service(db: Session = Depends(get_db)):
     return Permission(db, AccessRoleRuleRepositoryImpl(db), UserRoleRepositoryImpl(db),
                       BusinessElementRepositoryImpl(db))
+
 
 def get_business_element_service(db: Session = Depends(get_db)):
     return BusinessElementService(BusinessElementRepositoryImpl(db))
@@ -76,5 +82,6 @@ def get_access_rule_service(db: Session = Depends(get_db)):
 def get_user_role_service(db: Session = Depends(get_db)):
     return UserRoleService(UserRoleRepositoryImpl(db))
 
-def get_blacklist_service():
-    return TokenBlacklistService()
+
+# def get_blacklist_service():
+#     return TokenBlacklistService()

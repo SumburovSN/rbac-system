@@ -4,6 +4,8 @@ from app.domain.access_role_rule import AccessRoleRule as DomainRule
 from app.infrastructure.db.models.access_role_rule import AccessRoleRule as DbRule
 from app.infrastructure.db.models.business_element import BusinessElement as DbBusinessElement
 from app.infrastructure.db.models.role import Role as DbRole
+from app.infrastructure.db.models.user import User as DbUser
+from app.infrastructure.db.models.user_role import UserRole as DbUserRole
 
 
 class AccessRoleRuleRepositoryImpl(AccessRoleRuleRepository):
@@ -50,6 +52,52 @@ class AccessRoleRuleRepositoryImpl(AccessRoleRuleRepository):
         self.db.commit()
         self.db.refresh(db_rule)
         return self._to_domain((db_rule, None, None))
+
+    def get_full(
+            self,
+            email: str | None,
+            user_name: str | None,
+            role_name: str | None,
+            element_code: str | None,
+            offset: int,
+            limit: int
+    ):
+        query = (
+            self.db.query(
+                DbUser.id.label("user_id"),
+                DbUser.email.label("user_email"),
+                DbUser.name.label("user_name"),
+                DbRole.name.label("role_name"),
+                DbRole.description.label("role_description"),
+                DbBusinessElement.code.label("element_code"),
+                DbBusinessElement.name.label("element_name"),
+                DbRule.create_permission.label("create"),
+                DbRule.read_permission.label("read"),
+                DbRule.update_permission.label("update"),
+                DbRule.delete_permission.label("delete"),
+            )
+            .select_from(DbUser)
+            .join(DbUserRole, DbUserRole.user_id == DbUser.id)
+            .join(DbRole, DbRole.id == DbUserRole.role_id)
+            .join(DbRule, DbRule.role_id == DbRole.id)
+            .join(DbBusinessElement, DbBusinessElement.id == DbRule.element_id)
+        )
+
+        # Фильтры (все через AND)
+        if email:
+            query = query.filter(DbUser.email.ilike(f"%{email}%"))
+        if user_name:
+            query = query.filter(DbUser.name.ilike(f"%{user_name}%"))
+        if role_name:
+            query = query.filter(DbRole.name.ilike(f"%{role_name}%"))
+        if element_code:
+            query = query.filter(DbBusinessElement.code.ilike(f"%{element_code}%"))
+
+        # Пагинация
+        query = query.offset(offset).limit(limit)
+
+        return query.all()
+
 
     @staticmethod
     def _to_domain(db_rule: DbRule) -> DomainRule:

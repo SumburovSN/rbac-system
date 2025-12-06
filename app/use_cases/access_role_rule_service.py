@@ -51,3 +51,15 @@ class AccessRoleRuleService:
 
         # role_id и element_id менять НЕЛЬЗЯ — это первичный ключ правила
         return self.repo.update(rule, update_data)
+
+    def get_full(
+            self,
+            email: str | None,
+            user_name: str | None,
+            role_name: str | None,
+            element_code: str | None,
+            page: int,
+            size: int
+    ):
+        offset = (page - 1) * size
+        return self.repo.get_full(email, user_name, role_name, element_code, offset, size)

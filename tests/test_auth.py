@@ -1,7 +1,10 @@
 import pytest
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.testclient import TestClient
 from app.main import app
-from app.api.dependencies import get_user_service, get_current_user, get_permission_service, get_blacklist_service
+from app.api.dependencies import get_user_service, get_current_user, get_permission_service, get_blacklist_service, \
+    bearer_scheme
 from app.use_cases.users_service import UserService
 from app.use_cases.permission import Permission
 from app.use_cases.blacklist_service import TokenBlacklistService
@@ -23,11 +26,11 @@ class MockUser:
 class MockUserService:
     def register(self, name, email, password):
         provider = JWTTokenProvider()
-        return provider.encode({"sub": 1})
+        return provider.encode({"sub": "1"})
 
     def login(self, email, password):
         provider = JWTTokenProvider()
-        return provider.encode({"sub": 1})
+        return provider.encode({"sub": "1"})
 
     def get_users_list(self):
         return [MockUser(1, "test@example.com")]
@@ -69,8 +72,15 @@ def mock_get_permission_service():
     return MockPermission()
 
 
-def mock_get_current_user():
+# def mock_get_current_user():
+#     return MockUser(id=1, email="x")
+
+def mock_get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    token = credentials.credentials
+    if mock_blacklist.contains(token):
+        raise HTTPException(status_code=401, detail="Token revoked")
     return MockUser(id=1, email="x")
+
 
 
 def mock_get_blacklist_service():
@@ -115,7 +125,7 @@ def test_login():
 
 
 def test_users_list_authorized():
-    token = JWTTokenProvider().encode({"sub": 1})
+    token = JWTTokenProvider().encode({"sub": "1"})
 
     response = client.get(
         "/auth/users_list",
@@ -127,7 +137,7 @@ def test_users_list_authorized():
 
 
 def test_logout_blacklists_token():
-    token = JWTTokenProvider().encode({"sub": 1})
+    token = JWTTokenProvider().encode({"sub": "1"})
 
     response = client.post(
         "/auth/logout",
@@ -139,7 +149,7 @@ def test_logout_blacklists_token():
 
 
 def test_blacklisted_token_rejected():
-    token = JWTTokenProvider().encode({"sub": 1})
+    token = JWTTokenProvider().encode({"sub": "1"})
     mock_blacklist.add(token, 9999999999)
 
     response = client.get(

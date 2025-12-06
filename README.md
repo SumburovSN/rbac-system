@@ -61,8 +61,9 @@ RBAC (Role Based Access Control)
 В Swagger сначала эндпоинт логин, например: email "superadmin@example.com", password: "admin" - получаем JWT токен
 Затем в Swagger идем вверх, справа жмем кнопку AUTHORIZE и вводим токен в HTTPBearer  (http, Bearer) Value.
 
+Для работы приложения (именно blacklist logout) требуется запуск сервера Redis. 
+
 Не реализованы (продолжаю работать над):
-1. pytest
-2. Репозиторий под postgesql
+1. Репозиторий под postgesql
 
 

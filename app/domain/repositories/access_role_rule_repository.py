@@ -22,3 +22,6 @@ class AccessRoleRuleRepository(ABC):
     @abstractmethod
     def update(self, rule: AccessRoleRule, data: dict) -> AccessRoleRule:
         pass
+
+    def get_full(self, email, user_name, role_name, element_code, offset, size):
+        pass

@@ -4,7 +4,7 @@ from app.api.schemas.rbac import (
     RoleCreate, RoleUpdate, RoleOut,
     BusinessElementCreate, BusinessElementUpdate, BusinessElementOut,
     AccessRoleRuleCreate, AccessRoleRuleUpdate, AccessRoleRuleOut, AccessRoleRuleWithNamesOut, UserRoleOut,
-    UserRoleCreate, UserRoleWithNamesOut, UserRoleUpdate
+    UserRoleCreate, UserRoleWithNamesOut, UserRoleUpdate, AccessFullOut
 )
 from app.api.dependencies import (
     get_role_service, get_business_element_service, get_access_rule_service,
@@ -12,6 +12,26 @@ from app.api.dependencies import (
 )
 
 router = APIRouter(prefix="/rbac", tags=["RBAC"])
+
+# ====================================================
+#                       Observe All
+# ====================================================
+@router.get("/full", response_model=list[AccessFullOut])
+async def get_full_access_relations(
+    email: str | None = None,
+    user_name: str | None = None,
+    role_name: str | None = None,
+    element_code: str | None = None,
+    page: int = 1,
+    size: int = 20,
+    service=Depends(get_access_rule_service),
+    user=Depends(get_current_user),
+    permission: Permission = Depends(get_permission_service),
+):
+    if not permission.has_permission(user.id, "users", "read"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    return service.get_full(email, user_name, role_name, element_code, page, size)
 
 # ====================================================
 #                       ROLES

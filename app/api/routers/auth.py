@@ -37,10 +37,10 @@ async def login_user(
 @router.post("/logout")
 async def logout(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
+    blacklist = Depends(get_blacklist_service)
 ):
     token = credentials.credentials
-
     token_provider = JWTTokenProvider()
     payload = token_provider.decode(token)
 
@@ -51,7 +51,7 @@ async def logout(
     if exp is None:
         raise HTTPException(status_code=400, detail="Invalid token")
 
-    blacklist = get_blacklist_service()
+    # blacklist = get_blacklist_service()
     # Добавляем токен в blacklist
     blacklist.add(token, exp)
 
