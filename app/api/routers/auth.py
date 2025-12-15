@@ -1,13 +1,18 @@
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import HTTPAuthorizationCredentials
+from uuid import UUID
+
+from fastapi import APIRouter, HTTPException, Depends, Request, Response
 from app.api.schemas.auth import UserRegister, UserLogin, Token, UserOut, UserUpdate
+from app.api.session_cookie import SessionCookieManager
 from app.domain.interfaces.security.jwt_provider_impl import JWTTokenProvider
 from app.use_cases.permission import Permission
+from app.use_cases.session_service import SessionService
 from app.use_cases.users_service import UserService
-from app.api.dependencies import get_user_service, get_current_user, get_permission_service, bearer_scheme, \
-    get_blacklist_service
+from app.api.dependencies import get_user_service, get_current_user, get_permission_service, get_session_service
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+cookie_manager = SessionCookieManager(max_age=3600)
 
 
 @router.post("/register", response_model=Token)
@@ -23,39 +28,58 @@ async def register_user(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/login", response_model=Token)
-async def login_user(
+@router.post("/login")
+async def login(
     data: UserLogin,
-    service: UserService = Depends(get_user_service)
+    response: Response,
+    user_service: UserService = Depends(get_user_service),
+    session_service: SessionService = Depends(get_session_service),
 ):
-    try:
-        token = service.login(str(data.email), data.password)
-        return Token(access_token=token)
-    except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+    # Проверяем логин/пароль
+    user = user_service.login(data.email, data.password)
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    # Создаем сессию в Redis
+    session = await session_service.create_session(
+        user_id=user.id,
+        ip=None,
+        user_agent="browser"
+    )
+
+    # Создаем JWT по session.uuid
+    jwt_provider = JWTTokenProvider()
+    token = jwt_provider.encode(str(session.uuid))
+
+    # Устанавливаем cookie
+    cookie_manager.set_cookie(response, token)
+
+    return {"detail": "Logged in", "session_id": session.uuid}
+
+
 
 @router.post("/logout")
 async def logout(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    current_user=Depends(get_current_user),
-    blacklist = Depends(get_blacklist_service)
+    request: Request,
+    response: Response,
+    session_service: SessionService = Depends(get_session_service)
 ):
-    token = credentials.credentials
-    token_provider = JWTTokenProvider()
-    payload = token_provider.decode(token)
+    token = cookie_manager.get_cookie(request)
+    if not token:
+        raise HTTPException(401, "No session token")
 
+    jwt_provider = JWTTokenProvider()
+    payload = jwt_provider.decode(token)
     if payload is None:
-        raise HTTPException(status_code=400, detail="Invalid token")
+        raise HTTPException(401, "Invalid token")
 
-    exp = payload.get("exp")
-    if exp is None:
-        raise HTTPException(status_code=400, detail="Invalid token")
+    session_id = payload.get("sid")
+    if session_id:
+        await session_service.delete_session(UUID(session_id))
 
-    # blacklist = get_blacklist_service()
-    # Добавляем токен в blacklist
-    blacklist.add(token, exp)
+    cookie_manager.delete_cookie(response)
 
-    return {"detail": "Logged out successfully"}
+    return {"detail": "Logged out"}
 
 
 @router.get("/users_list", response_model=list[UserOut])

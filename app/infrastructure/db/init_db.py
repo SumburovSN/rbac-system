@@ -1,5 +1,5 @@
 from app.api.schemas.rbac import BusinessElementCreate, RoleCreate, AccessRoleRuleCreate, UserRoleCreate
-from app.infrastructure.db.session import SessionLocal
+from app.infrastructure.db.db_session import SessionLocal
 from app.infrastructure.db import base
 from app.api.dependencies import (get_user_service, get_business_element_service, get_role_service,
                                   get_access_rule_service, get_user_role_service)

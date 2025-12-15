@@ -22,7 +22,7 @@ class UserService:
         # Генерируем JWT
         return self.token_provider.encode({"sub": str(saved_user.id)})
 
-    def login(self, email: str, password: str) -> str:
+    def login(self, email: str, password: str) -> DomainUser:
         user = self.repo.get_by_email(email)
         if not user:
             raise ValueError("User not found")
@@ -31,7 +31,8 @@ class UserService:
         if not user.verify_password(password, hasher=self.hasher):
             raise ValueError("Invalid credentials")
         # Генерируем JWT
-        return self.token_provider.encode({"sub": str(user.id)})
+        # return self.token_provider.encode({"sub": str(user.id)})
+        return user
 
     def get_users_list(self) -> list[UserOut]:
         domain_users = self.repo.get_all()

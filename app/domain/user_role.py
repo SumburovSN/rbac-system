@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class UserRole:
     id: int | None
@@ -7,7 +8,6 @@ class UserRole:
     role_id: int
     user_name: str | None = None
     role_name: str | None = None
-
 
     @staticmethod
     def create(user_id: int, role_id: int, user_name: str = None, role_name: str = None):

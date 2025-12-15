@@ -7,46 +7,13 @@ RBAC (Role Based Access Control)
 4. Правила для ролей (id, id роли, id бизнес-элемента, read_permission, create_permission, update_permission, delete_permission) 
 5. Назначение ролей пользователям (id, id пользователя, id роли)
 
-База данных инициализируется данными:
-Пользователи:
-        ("Superadmin", "superadmin@example.com", "admin")
-        ("Access Admin", "access.admin@example.com", "access123")
-        ("Warehouse Manager", "warehouse.manager@example.com", "whmanager")
-        ("Warehouse Viewer", "warehouse.viewer@example.com", "whviewer")
-        ("Procurement Manager", "procurement.manager@example.com", "procmanager")
-        ("Procurement Viewer", "procurement.viewer@example.com", "procviewer")
-        ("Auditor", "auditor@example.com", "audit123")
-Бизнес-элементы
-        ("all", "Все базы данных"),
-        ("users", "Список пользователей"),
-        ("business_elements", "Блоки приложения для доступа"),
-        ("roles", "Пользовательские роли"),
-        ("access_role_rules", "Правила доступа роли к блоку приложения"),
-        ("user_roles", "Назначение роли (предоставление права доступа к блоку приложения"),
-        ("goods", "Склад, получение товаров и распределение их по магазинам"),
-        ("orders", "Заказ товаров и работа с поставщиками"),
-    
-Роли:
-        ("Superadmin", "Администратор базы данных (полный доступ ко всем таблицам и ролям)")
-        ("AccessAdmin", "Администратор прав доступа (может управлять пользователями и ролями)")
-        ("WarehouseManager", "Менеджер склада (полный доступ к товарам на складе)")
-        ("WarehouseViewer", "Просмотр склада (только чтение товаров)")
-        ("ProcurementManager", "Менеджер закупок (полный CRUD по заказам)")
-        ("ProcurementViewer", "Просмотр заказов (только чтение)")
-        ("Auditor", "Аудитор (чтение всех данных без возможности изменения)")
-Правила для ролей:
-        ("Superadmin", "all", True, True, True, True)        
-        ("AccessAdmin", "users", True, True, True, True),
-        ("AccessAdmin", "user_roles", True, True, True, True),
-        ("AccessAdmin", "business_elements", True, True, True, True),
-        ("AccessAdmin", "access_role_rules", True, True, True, True),
-        ("WarehouseManager", "goods", True, True, True, True),        
-        ("ProcurementManager", "orders", True, True, True, True),        
-        ("WarehouseViewer", "goods", True, False, False, False),
-        ("ProcurementViewer", "orders", True, False, False, False),
-        ("Auditor", "goods", True, False, False, False),
-        ("Auditor", "orders", True, False, False, False)
-Роли распределяются по пользователям соответствующим образом.
+Система аутентификации настроена следующим образом:
+1. Login: Создается объект сессии с uuid
+2. Создается jwt token, который включает uuid сессии
+3. jwt token отправляется пользователю в виде cookies
+
+Начать в Swagger можно, используя данные "Superadmin", email: "superadmin@example.com", password: "admin".
+Таблицы инициализируются значениями, которые можно посмотреть в app/infrastructure/db/init_db.py.
 
 Все endpoints проверяют полномочия на соответствующее действие, за исключением:
 1. Регистрация пользователя
@@ -58,12 +25,22 @@ RBAC (Role Based Access Control)
 Приложение на основе FastAPI
 ЗАПУСК: uvicorn app.main:app --reload
 Переадресация  http://127.0.0.1:8000 сразу на Swagger
-В Swagger сначала эндпоинт логин, например: email "superadmin@example.com", password: "admin" - получаем JWT токен
-Затем в Swagger идем вверх, справа жмем кнопку AUTHORIZE и вводим токен в HTTPBearer  (http, Bearer) Value.
 
-Для работы приложения (именно blacklist logout) требуется запуск сервера Redis. 
+Для работы приложения требуется запуск сервера Redis. Например, на Ubuntu установка Valkey-server (fork Redis): 
+- sudo apt install redis-tools
+- sudo apt install valkey-redis-compat
+Запуск:
+- sudo systemctl start valkey
+- sudo systemctl status valkey
+Проверка:
+- redis-cli ping
+Потребовалось удаление файла миграции:
+- sudo rm /etc/valkey/REDIS_MIGRATION
+Перезапуск:
+- sudo systemctl restart valkey-server
 
 Не реализованы (продолжаю работать над):
 1. Репозиторий под postgesql
+2. Тесты
 
 
