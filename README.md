@@ -1,5 +1,5 @@
 RBAC (Role Based Access Control)
-Таблицы реализованы в sqlite
+Таблицы реализованы в sqlite и в postgres (при наличии .env - пример example.env)
 Структура данных:
 1. Пользователи(id, email, имя, is_active-для мягкого удаления)
 2. Роли (id, наименование, описание)
@@ -23,7 +23,7 @@ RBAC (Role Based Access Control)
 а также полномочия. Пользователю даются полномочия read, update, delete своего аккаунта (по user_id) 
 
 Приложение на основе FastAPI
-ЗАПУСК: uvicorn app.main:app --reload
+ЗАПУСК из корневой папки: uvicorn app.main:app --reload
 Переадресация  http://127.0.0.1:8000 сразу на Swagger
 
 Для работы приложения требуется запуск сервера Redis. Например, на Ubuntu установка Valkey-server (fork Redis): 
@@ -39,8 +39,13 @@ RBAC (Role Based Access Control)
 Перезапуск:
 - sudo systemctl restart valkey-server
 
+
+alembic запускать из директории app:
+alembic revision --autogenerate -m "initial schema"
+alembic upgrade head
+
 Не реализованы (продолжаю работать над):
-1. Репозиторий под postgesql
-2. Тесты
+1. Тесты
+2. Проверка наличия базы данных rbac_api в postgres и ее создание при отсутствии  
 
 
