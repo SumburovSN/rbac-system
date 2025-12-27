@@ -10,17 +10,18 @@ class UserService:
         self.hasher = BcryptPasswordHasher()
         self.token_provider = JWTTokenProvider()
 
-    def register(self, name: str, email: str, password: str) -> str:
+    def register(self, name: str, email: str, password: str) -> DomainUser:
         # Проверка на уникальность email
         existing = self.repo.get_by_email(email)
         if existing:
             raise ValueError("User already registered")
         # Создание доменной сущности
-        saved_user = DomainUser.create(name=name, email=email, password=password, hasher=self.hasher)
+        new_user = DomainUser.create(name=name, email=email, password=password, hasher=self.hasher)
         # Сохранение
-        self.repo.create(saved_user)
+        saved_user = self.repo.create(new_user)
+        return saved_user
         # Генерируем JWT
-        return self.token_provider.encode({"sub": str(saved_user.id)})
+        # return self.token_provider.encode({"sub": str(saved_user.id)})
 
     def login(self, email: str, password: str) -> DomainUser:
         user = self.repo.get_by_email(email)

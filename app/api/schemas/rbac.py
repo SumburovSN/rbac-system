@@ -18,9 +18,7 @@ class RoleOut(BaseModel):
     name: str
     description: str | None = None
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 # =============== BUSINESS ELEMENT =================
@@ -40,9 +38,7 @@ class BusinessElementOut(BaseModel):
     code: str
     name: str
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ ACCESS ROLE RULE ====================
@@ -72,9 +68,7 @@ class AccessRoleRuleOut(BaseModel):
     update_permission: bool
     delete_permission: bool
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccessRoleRuleWithNamesOut(BaseModel):
@@ -88,9 +82,7 @@ class AccessRoleRuleWithNamesOut(BaseModel):
     update_permission: bool
     delete_permission: bool
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============ USER ROLE RULE ====================
@@ -111,9 +103,7 @@ class UserRoleOut(BaseModel):
     user_id: int
     role_id: int
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserRoleWithNamesOut(BaseModel):
@@ -123,9 +113,7 @@ class UserRoleWithNamesOut(BaseModel):
     user_name: str
     role_name: str
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserAccessInfo(BaseModel):
@@ -134,9 +122,7 @@ class UserAccessInfo(BaseModel):
     email: EmailStr
     role_name: str
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccessFullOut(BaseModel):
@@ -152,6 +138,6 @@ class AccessFullOut(BaseModel):
     update: bool
     delete: bool
 
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 

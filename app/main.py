@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.api.routers import auth, rbac, goods, orders
+from app.config import COOKIES_MAX_AGE
 from app.infrastructure.db.db_session import engine
 from fastapi.responses import RedirectResponse
 from app.infrastructure.db.init_db import (create_tables, populate_users, populate_business_elements, populate_roles,
-                                           populate_access_role_rules, populate_user_roles)
+                                           populate_access_role_rules, populate_user_roles, initial_populate_all_db)
 from fastapi.openapi.utils import get_openapi
 
 
@@ -12,11 +13,12 @@ from fastapi.openapi.utils import get_openapi
 async def lifespan(application: FastAPI):
     # startup
     create_tables(engine)
-    populate_users()
-    populate_business_elements()
-    populate_roles()
-    populate_access_role_rules()
-    populate_user_roles()
+    # populate_users()
+    # populate_business_elements()
+    # populate_roles()
+    # populate_access_role_rules()
+    # populate_user_roles()
+    initial_populate_all_db()
     yield
     # shutdown
     print("Приложение завершает работу...")

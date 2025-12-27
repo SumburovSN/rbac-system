@@ -44,7 +44,7 @@ async def create_role(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     try:
         return service.create(data)
@@ -58,7 +58,7 @@ async def list_roles(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     return service.get_all()
 
@@ -70,7 +70,7 @@ async def get_role(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     role = service.get(role_id)
     if not role:
@@ -86,7 +86,7 @@ async def update_role(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     role = service.get(role_id)
     if not role:
@@ -107,7 +107,7 @@ async def create_element(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "business_elements", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     try:
         return service.create(data)
@@ -121,7 +121,7 @@ async def list_elements(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "business_elements", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     return service.get_all()
 
@@ -133,7 +133,7 @@ async def get_element(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "business_elements", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     element = service.get(element_id)
     if not element:
@@ -149,7 +149,7 @@ async def update_element(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "business_elements", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     element = service.get(element_id)
     if not element:
@@ -171,7 +171,7 @@ async def create_rule(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     try:
         return service.create(data)
@@ -185,7 +185,7 @@ async def list_rules(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     return service.get_all()
 
@@ -197,7 +197,7 @@ async def get_rule(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     rule = service.get(rule_id)
     if not rule:
@@ -213,7 +213,7 @@ async def update_rule(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "access_role_rules", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     rule = service.get(rule_id)
     if not rule:
@@ -235,7 +235,7 @@ async def create_user_role(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "user_roles", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     try:
         return service.create(data)
@@ -249,7 +249,7 @@ async def list_all_user_roles(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "user_roles", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     domain_user_roles = service.get_all()
     return [UserRoleWithNamesOut(
@@ -269,7 +269,7 @@ async def get_user_role(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "user_roles", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     domain_user_roles = service.get_by_user(user_id)
     return [UserRoleWithNamesOut(
@@ -290,7 +290,7 @@ async def update_rule(
     user=Depends(get_current_user),
     permission: Permission = Depends(get_permission_service)
 ):
-    if not permission.has_permission(user.id, "users", "read"):
+    if not permission.has_permission(user.id, "user_roles", "read"):
         raise HTTPException(status_code=403, detail="Forbidden")
     user_role = service.get(user_role_id)
     if not user_role:

@@ -1,7 +1,6 @@
 from uuid import UUID
-import redis.asyncio as aioredis
 from fastapi import Request
-from app.infrastructure.redis_client import redis_client
+from app.infrastructure.redis_client import get_redis_client
 from app.domain.repositories.session_repository_redis import SessionRepositoryRedis
 from app.use_cases.session_service import SessionService
 from app.api.session_cookie import SessionCookieManager
@@ -23,25 +22,25 @@ from app.infrastructure.repositories.business_element_repo import BusinessElemen
 from app.use_cases.access_role_rule_service import AccessRoleRuleService
 from app.infrastructure.repositories.access_role_rule_repo import AccessRoleRuleRepositoryImpl
 
-
+# Оставим альтернативную возможность авторизации
+# Но работает и без этого с Session и Cookies
 # bearer_scheme = HTTPBearer()
 
-def get_redis_client() -> aioredis.Redis:
-    return redis_client
-
-
-def get_session_repository(redis_client: aioredis.Redis = Depends(get_redis_client)):
+def get_session_repository(
+    redis_client = Depends(get_redis_client)
+):
     return SessionRepositoryRedis(redis_client)
 
 
-async def get_session_service(repo: SessionRepositoryRedis = Depends(get_session_repository)):
-    # можно брать ttl из настроек, здесь дефолт 3600
-    return SessionService(repo, session_ttl_seconds=3600)
+async def get_session_service(
+    repo = Depends(get_session_repository)
+):
+    return SessionService(repo)
 
 
 def get_cookie_manager():
     # secure False for local dev; set env/config in prod
-    return SessionCookieManager(secure=False, samesite="lax")
+    return SessionCookieManager()
 
 
 def get_db():
@@ -55,10 +54,11 @@ def get_db():
 async def get_current_user(
     request: Request,
     db: Session = Depends(get_db),
+    cookie_manager = Depends(get_cookie_manager),
     session_service: SessionService = Depends(get_session_service)
 ) -> User:
 
-    token = get_cookie_manager().get_cookie(request)
+    token = cookie_manager.get_cookie(request)
     if not token:
         raise HTTPException(401, "Missing cookie")
 

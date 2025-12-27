@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Depends, Request, Response
+from fastapi import APIRouter, HTTPException, Depends, Request, Response, Header
 from app.api.schemas.auth import UserRegister, UserLogin, Token, UserOut, UserUpdate
 from app.api.session_cookie import SessionCookieManager
 from app.domain.interfaces.security.jwt_provider_impl import JWTTokenProvider
@@ -12,18 +12,18 @@ from app.api.dependencies import get_user_service, get_current_user, get_permiss
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-cookie_manager = SessionCookieManager(max_age=3600)
+cookie_manager = SessionCookieManager()
 
 
-@router.post("/register", response_model=Token)
+@router.post("/register", response_model=UserOut)
 async def register_user(
     data: UserRegister,
     service: UserService = Depends(get_user_service),
-    # user=Depends(get_current_user)
+    # user=Depends(get_current_user) # Пусть новый пользователь сам регистрируется
 ):
     try:
-        token = service.register(data.name, data.email, data.password)
-        return Token(access_token=token)
+        user_id = service.register(data.name, data.email, data.password)
+        return user_id
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -31,10 +31,20 @@ async def register_user(
 @router.post("/login")
 async def login(
     data: UserLogin,
+    request: Request,
     response: Response,
+    user_agent: str = Header(None),
     user_service: UserService = Depends(get_user_service),
     session_service: SessionService = Depends(get_session_service),
 ):
+    # Получаем User-Agent из заголовков
+    # Если прокси, может быть в X-Forwarded-For
+    if user_agent:
+        user_agent_header = user_agent
+    else:
+        # В случае отсутствия прокси
+        user_agent_header = request.headers.get('user-agent')
+
     # Проверяем логин/пароль
     user = user_service.login(data.email, data.password)
     if not user:
@@ -43,19 +53,20 @@ async def login(
     # Создаем сессию в Redis
     session = await session_service.create_session(
         user_id=user.id,
-        ip=None,
-        user_agent="browser"
+        ip=request.client.host,
+        user_agent=user_agent_header
     )
 
     # Создаем JWT по session.uuid
     jwt_provider = JWTTokenProvider()
-    token = jwt_provider.encode(str(session.uuid))
-
+    token = jwt_provider.encode(session_data={
+        "sid": str(session.uuid),
+        "iat": int(session.created_at.timestamp()),
+        "exp": int(session.expires_at.timestamp())})
     # Устанавливаем cookie
     cookie_manager.set_cookie(response, token)
 
     return {"detail": "Logged in", "session_id": session.uuid}
-
 
 
 @router.post("/logout")

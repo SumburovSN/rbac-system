@@ -3,16 +3,16 @@ from uuid import uuid4, UUID
 
 from app.domain.session import Session
 from app.domain.interfaces.session_repository import SessionRepository
+from app.config import COOKIES_MAX_AGE
 
 
 class SessionService:
-    def __init__(self, repo: SessionRepository, session_ttl_seconds: int = 3600):
+    def __init__(self, repo: SessionRepository):
         """
         :param repo: repository for sessions (Redis)
-        :param session_ttl_seconds: session lifetime
         """
         self.repo = repo
-        self.session_ttl_seconds = session_ttl_seconds
+        self.session_ttl_seconds = COOKIES_MAX_AGE
 
     async def create_session(
         self,

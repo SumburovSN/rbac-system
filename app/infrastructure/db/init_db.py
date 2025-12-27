@@ -43,7 +43,7 @@ def populate_business_elements():
         ("all", "Все базы данных"),
         ("users", "Список пользователей"),
         ("business_elements", "Блоки приложения для доступа"),
-        ("roles", "Пользовательские роли"),
+        # ("roles", "Пользовательские роли"), # объединены с user_roles
         ("access_role_rules", "Правила доступа роли к блоку приложения"),
         ("user_roles", "Назначение роли (предоставление права доступа к блоку приложения"),
         ("goods", "Склад, получение товаров и распределение их по магазинам"),
@@ -145,3 +145,10 @@ def populate_user_roles():
                 service.create(UserRoleCreate(user_id=user_id, role_id=role_id))
             except ValueError:
                 pass  # правило уже существует
+
+def initial_populate_all_db():
+    populate_users()
+    populate_business_elements()
+    populate_roles()
+    populate_access_role_rules()
+    populate_user_roles()

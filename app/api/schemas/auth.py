@@ -24,9 +24,7 @@ class UserOut(BaseModel):
     email: EmailStr
     is_active: bool
 
-    # class Config:
-    #     from_attributes = True
-    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):

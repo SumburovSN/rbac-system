@@ -48,6 +48,7 @@ class SessionRepositoryRedis(SessionRepository):
 
         # выставляем TTL
         ttl_seconds = int((session.expires_at - datetime.now(UTC)).total_seconds())
+
         if ttl_seconds > 0:
             await self.client.expire(key, ttl_seconds)
         else:
@@ -59,9 +60,6 @@ class SessionRepositoryRedis(SessionRepository):
 
         if not data:
             return None
-
-        # redis возвращает bytes → decode
-        # decoded = {k.decode(): v.decode() for k, v in data.items()}
 
         return self._deserialize(data)
 
