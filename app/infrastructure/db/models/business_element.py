@@ -7,7 +7,7 @@ class BusinessElement(Base):
     __tablename__ = "business_elements"
 
     id = Column(Integer, primary_key=True, index=True)
-    code = Column(String, unique=True, nullable=False, index=True)
-    name = Column(String, nullable=False)
+    code = Column(String(100), unique=True, nullable=False, index=True)
+    name = Column(String(255), nullable=False)
 
     rules = relationship("AccessRoleRule", back_populates="element")

@@ -21,12 +21,3 @@ class AccessRoleRule(Base):
 
     role = relationship("Role", back_populates="rules")
     element = relationship("BusinessElement", back_populates="rules")
-
-    # read_permission = Column(Boolean, default=False)
-    # read_all_permission = Column(Boolean, default=False)
-    # create_permission = Column(Boolean, default=False)
-    # update_permission = Column(Boolean, default=False)
-    # update_all_permission = Column(Boolean, default=False)
-    # delete_permission = Column(Boolean, default=False)
-    # delete_all_permission = Column(Boolean, default=False)
-

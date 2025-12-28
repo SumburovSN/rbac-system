@@ -1,4 +1,5 @@
-/app/my_study_session.py
 /app/.env
 /rbac_api.db
 /app/alembic/versions/
+/tests/rbac_test.db
+/app/my_study/

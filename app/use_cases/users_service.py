@@ -47,7 +47,8 @@ class UserService:
         user = self.repo.get_by_id(user_id)
         if not user:
             raise ValueError("User not found")
-        update_data = data.dict(exclude_unset=True)
+        # update_data = data.dict(exclude_unset=True)
+        update_data = data.model_dump(exclude_unset=True)
         # Проверка на уникальность email
         existing = self.repo.get_by_email(update_data["email"])
         if existing:

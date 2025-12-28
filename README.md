@@ -39,13 +39,28 @@ RBAC (Role Based Access Control)
 Перезапуск:
 - sudo systemctl restart valkey-server
 
-
 alembic запускать из директории app:
 alembic revision --autogenerate -m "initial schema"
 alembic upgrade head
 
+Тестирование осуществляется в tests/test_with_sqlite_redis.py без mock, а с работающими базами данных.
+Для теста необходима работающая служба Redis.
+
+Добавлен файл запуска проекта scripts/init.py:
+## Project initialization
+
+Requirements:
+- Python 3.11+
+- PostgreSQL running 
+- Database user configured
+bash:
+git clone ...
+cd rbac_system
+python scripts/init.py
+
+
 Не реализованы (продолжаю работать над):
-1. Тесты
-2. Проверка наличия базы данных rbac_api в postgres и ее создание при отсутствии  
+1. Проверка init.py
+2. docker
 
 
