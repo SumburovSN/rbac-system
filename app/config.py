@@ -11,3 +11,7 @@ COOKIES_SECURE = False # Это для тестов, но для релиза в
 COOKIES_HTTPONLY = os.getenv("COOKIES_HTTPONLY", "true").lower() == "true"
 COOKIES_SAME_SITE = os.getenv("COOKIES_SAME_SITE", "lax")
 COOKIES_PATH = os.getenv("COOKIES_PATH", "/")
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"

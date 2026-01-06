@@ -58,9 +58,8 @@ git clone ...
 cd rbac_system
 python scripts/init.py
 
+Docker image: https://hub.docker.com/r/sumburovsn/rbac-api
 
-Не реализованы (продолжаю работать над):
-1. Проверка init.py
-2. docker
-
-
+Спасибо ChatGPT, научил, написал, помог с ошибками.
+Пока всё, останавливаю работу.
+Всё работает корректно и локально и в docker, Я проверил.

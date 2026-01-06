@@ -34,9 +34,4 @@ class BusinessElementService:
             if existing_code and existing_code.id != element_id:
                 raise ValueError("BusinessElement with this code already exists")
 
-        # if "name" in update_data:
-        #     existing_name = self.repo.get_by_name(update_data["name"])
-        #     if existing_name and existing_name.id != element_id:
-        #         raise ValueError("BusinessElement with this name already exists")
-
         return self.repo.update(element, update_data)

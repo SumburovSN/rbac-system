@@ -20,8 +20,6 @@ class UserService:
         # Сохранение
         saved_user = self.repo.create(new_user)
         return saved_user
-        # Генерируем JWT
-        # return self.token_provider.encode({"sub": str(saved_user.id)})
 
     def login(self, email: str, password: str) -> DomainUser:
         user = self.repo.get_by_email(email)
@@ -31,8 +29,6 @@ class UserService:
             raise ValueError("Account is deleted")
         if not user.verify_password(password, hasher=self.hasher):
             raise ValueError("Invalid credentials")
-        # Генерируем JWT
-        # return self.token_provider.encode({"sub": str(user.id)})
         return user
 
     def get_users_list(self) -> list[UserOut]:
@@ -47,7 +43,6 @@ class UserService:
         user = self.repo.get_by_id(user_id)
         if not user:
             raise ValueError("User not found")
-        # update_data = data.dict(exclude_unset=True)
         update_data = data.model_dump(exclude_unset=True)
         # Проверка на уникальность email
         existing = self.repo.get_by_email(update_data["email"])
